@@ -6,8 +6,10 @@
 
 //include newline
 #include "rmnewline.c"
-//include the haversine formula
+
+//include the haversine formula implemented in c
 #include "haversine.c"
+
 
 int validate_lat(double lat){
     if(lat < -90 || lat > 90){
@@ -25,6 +27,14 @@ int validate_lon(double lon){
     }
 }
 
+void error(int input_given, int counter){
+    if(input_given && counter > 0){
+        printf("Error parsing file on line %d\n", counter+2);
+        exit(EXIT_FAILURE);
+    }else if(!input_given && counter > 0){
+        printf("Error on input, the values were ignored, try again\n");
+    }
+}
 
 int main(int argc, char **argv){
 
@@ -84,6 +94,7 @@ int main(int argc, char **argv){
     }
 
     fgets(description, 200, ifp);
+    remove_newline(description);
 
     double total = 0;
 
@@ -100,7 +111,7 @@ int main(int argc, char **argv){
     double lat2 = 111;
     double lon2 = 222;
 
-    int counter = 1;
+    int counter = 0;
 
     if(!input_given){
         printf("Enter coordinates in the following format:\n");
@@ -108,51 +119,61 @@ int main(int argc, char **argv){
         printf("After entering all the coordinated type --quit--\n");
     }
 
-    while((cont_input == 1) && (fgets(line, 512, ifp) != NULL)){
+    while(cont_input == 1 && (total == 0 || cont_input == 1) && (fgets(line, 512, ifp) != NULL)){
 
-        if(!strcmp(line,"--quit--")){
-            // Change condition to beak out of the loop
+        if(!strcmp(line,"--quit--\n")){
+            // Change condition to break out of the loop
             cont_input = 0;
+
         }else{
 
-        // Get 1st token
-        token = strtok(line, ",");
+            if(sscanf(line,"%lf,%lf\n",&lat1,&lon1) == 2){
+                #ifdef DEBUG
+                printf("Just got values\n");
+                #endif
 
-        // Turn it into a float
-        lat1 = atof(token);
+                // Check that all values are usable
+                if(validate_lat(lat1) && validate_lat(lat2) && validate_lon(lon1) && validate_lon(lon2)){
+                    #ifdef DEBUG
+                    printf("RUNNING WITH VALUES:\n");
+                    printf("\t--LAT1:%f\n\t--LON1:%f\n\t--LAT2:%f\n\t--LON2:%f\n", lat1,lon1,lat2,lon2);
+                    #endif
+                    total += dist(lat1,lon1,lat2,lon2);
+                    #ifdef DEBUG
+                    printf("NEW TOTAL: %f\n",total);
+                    #endif
+                }else{
+                    error(input_given,counter);
+                }
 
+                // Swap values
+                lat2 = lat1;
+                lon2 = lon1;
 
-        // Get the other token
-        token = strtok(NULL, ",");
+                
+                // Increase number of inputs taken
+                counter++;
+                
+                #ifdef DEBUG
+                printf("Number of inputs so far: %d\n",counter);
+                #endif
 
-        lon1 = atof(token);
-
-
-        // Avoid calculating on the first iteration
-        if(validate_lat(lat1) && validate_lat(lat2) && validate_lon(lon1) && validate_lon(lon2)){
-            // printf("RUNNING WITH VALUES:\n");
-            // printf("\t--LAT1:%f\n\t--LON1:%f\n\t--LAT2:%f\n\t--LON2:%f\n", lat1,lon1,lat2,lon2);
-            total += dist(lat1,lon1,lat2,lon2);
-            // printf("TOTALLING\n");
-            // printf("NEW TOTAL: %f\n",total);
+            }else{
+                error(input_given,counter);
+            }
         }
-
-        // Swap values
-        lat2 = lat1;
-        lon2 = lon1;
-
-        // Increase number of inputs taken
-        counter++;
-    }
 
 }
 
 
+    // Print number of coordinates read
+    printf("Coordinates read: %d\n", counter);
+
     /* Americans don't know kilometers */
-    printf("dist: %.1f km (%.1f mi.)\n", total, total / 1.609344);
+    printf("%s: %.1f km (%.1f mi.)\n",description, total, total / 1.609344);
 
         //Close the files if still open.
-    if(ifp){
+    if(ifp && input_given){
         fclose(ifp);
     }
 
