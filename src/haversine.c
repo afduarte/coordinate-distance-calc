@@ -1,7 +1,8 @@
 #include <math.h>
- 
+
 #define R 6371
 #define TO_RAD (3.1415926536 / 180)
+
 double dist(double th1, double ph1, double th2, double ph2)
 {
 	double dx, dy, dz;

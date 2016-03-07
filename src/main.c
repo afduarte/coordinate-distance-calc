@@ -5,10 +5,10 @@
 #include <stdlib.h>
 
 //include newline
-#include "rmnewline.c"
+#include "rmnewline.h"
 
 //include the haversine formula implemented in c
-#include "haversine.c"
+#include "haversine.h"
 
 
 int validate_lat(double lat){
@@ -166,11 +166,22 @@ int main(int argc, char **argv){
 }
 
 
-    // Print number of coordinates read
-    printf("Coordinates read: %d\n", counter);
-
-    /* Americans don't know kilometers */
-    printf("%s: %.1f km (%.1f mi.)\n",description, total, total / 1.609344);
+    // Print number of coordinates read if there was more than one given
+    if(counter <= 1){
+        printf("I need more coordinates\n");
+    }
+    
+    if(total <= 0){
+        printf("You gave me several places, but I need different ones to calculate a distance\n");
+    }
+    if(counter > 1 && total > 0){
+        printf("Coordinates read: %d\n", counter);
+    
+        /* Americans don't know kilometers */
+        printf("%s: %.1f km (%.1f mi.)\n",description, total, total / 1.609344);
+    }else{
+        exit(EXIT_FAILURE);
+    }
 
         //Close the files if still open.
     if(ifp && input_given){
