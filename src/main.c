@@ -11,27 +11,27 @@
 #include "haversine.h"
 
 
-int validate_lat(double lat){
-    if(lat < -90 || lat > 90){
+int validate_lat(double *lat){
+    if(*lat < -90 || *lat > 90){
         return 0;
     }else{
         return 1;
     }
 }
 
-int validate_lon(double lon){
-    if(lon < -180 || lon > 180){
+int validate_lon(double *lon){
+    if(*lon < -180 || *lon > 180){
         return 0;
     }else{
         return 1;
     }
 }
 
-void error(int input_given, int counter){
-    if(input_given && counter > 0){
-        printf("Error parsing file on line %d\n", counter+2);
+void error(int *input_given, int *counter){
+    if(*input_given && *counter > 0){
+        printf("Error parsing file on line %d\n", *counter+2);
         exit(EXIT_FAILURE);
-    }else if(!input_given && counter > 0){
+    }else if(!*input_given && *counter > 0){
         printf("Error on input, the values were ignored, try again\n");
     }
 }
@@ -133,7 +133,7 @@ int main(int argc, char **argv){
                 #endif
 
                 // Check that all values are usable
-                if(validate_lat(lat1) && validate_lat(lat2) && validate_lon(lon1) && validate_lon(lon2)){
+                if(validate_lat(&lat1) && validate_lat(&lat2) && validate_lon(&lon1) && validate_lon(&lon2)){
                     #ifdef DEBUG
                     printf("RUNNING WITH VALUES:\n");
                     printf("\t--LAT1:%f\n\t--LON1:%f\n\t--LAT2:%f\n\t--LON2:%f\n", lat1,lon1,lat2,lon2);
@@ -143,7 +143,7 @@ int main(int argc, char **argv){
                     printf("NEW TOTAL: %f\n",total);
                     #endif
                 }else{
-                    error(input_given,counter);
+                    error(&input_given,&counter);
                 }
 
                 // Swap values
@@ -159,7 +159,7 @@ int main(int argc, char **argv){
                 #endif
 
             }else{
-                error(input_given,counter);
+                error(&input_given,&counter);
             }
         }
 
