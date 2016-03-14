@@ -120,13 +120,10 @@ int main(int argc, char **argv){
     }
 
     while(cont_input == 1 && (total == 0 || cont_input == 1) && (fgets(line, 512, ifp) != NULL)){
-
         if(!strcmp(line,"--quit--\n")){
             // Change condition to break out of the loop
             cont_input = 0;
-
         }else{
-
             if(sscanf(line,"%lf,%lf\n",&lat1,&lon1) == 2){
                 #ifdef DEBUG
                 printf("Just got values\n");
@@ -150,7 +147,6 @@ int main(int argc, char **argv){
                 lat2 = lat1;
                 lon2 = lon1;
 
-                
                 // Increase number of inputs taken
                 counter++;
                 
@@ -162,9 +158,7 @@ int main(int argc, char **argv){
                 error(&input_given,&counter);
             }
         }
-
-}
-
+    }
 
     // Print number of coordinates read if there was more than one given
     if(counter <= 1){
@@ -176,22 +170,22 @@ int main(int argc, char **argv){
     }
     if(counter > 1 && total > 0){
         printf("Coordinates read: %d\n", counter);
-    
+
         /* Americans don't know kilometers */
         printf("%s: %.1f km (%.1f mi.)\n",description, total, total / 1.609344);
     }else{
         exit(EXIT_FAILURE);
     }
 
-        //Close the files if still open.
+    //Close the files if still open.
     if(ifp && input_given){
         fclose(ifp);
     }
 
+    // Free memory allocated for the file name
     if(input_file != NULL){
         free(input_file);
     }
 
     return 0;
-
 }
